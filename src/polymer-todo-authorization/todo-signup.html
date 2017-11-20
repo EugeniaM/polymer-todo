@@ -28,10 +28,10 @@
         color: var(--paper-teal-500);
       }
 
-      a {
+      .back-btn {
         color: var(--paper-teal-500);
-        text-decoration: none;
         font-weight: 600;
+        cursor: pointer;
       }
 
       paper-button {
@@ -61,16 +61,12 @@
       user="{{user}}">
     </firebase-auth>
 
-    <!--<firebase-query-->
-      <!--id="query"-->
-      <!--app-name="notes"-->
-      <!--path="/notes/[[uid]]"-->
-      <!--data="{{data}}">-->
-    <!--</firebase-query>-->
-
     <paper-card>
       <div class="signup-container">
-        <a href="/"><iron-icon icon="icons:arrow-back"></iron-icon> BACK</a>
+        <div class="back-btn" on-click="navigateBack">
+          <iron-icon icon="icons:arrow-back"></iron-icon>
+          BACK
+        </div>
         <h2>Please Sign Up</h2>
         <paper-input type="email" label="Email" value="{{email}}"></paper-input>
         <paper-input type="password" label="Password" value="{{password}}"></paper-input>
@@ -91,6 +87,11 @@
       static get is() { return 'todo-signup'; }
       static get properties() {
         return {
+          page: {
+            type: String,
+            value: '',
+            notify: true
+          },
           email: {
             type: String,
             value: ''
@@ -111,6 +112,10 @@
         }
       }
 
+      navigateBack() {
+        this.set('page', '');
+      }
+
       signUp() {
         if (!this.email || !this.password) {
           this.set('error.value', true);
@@ -120,7 +125,15 @@
 
         this.$.auth.createUserWithEmailAndPassword(this.email, this.password)
           .then((user) => {
-            console.log()
+            firebase.database().ref(`Users/${user.uid}`).set({
+              email: user.email
+            }, () => {
+              const event = new CustomEvent('do-redirect', {
+                bubbles: true, composed: true,
+                detail: { page: '/' }
+              });
+              this.dispatchEvent(event);
+            });
           })
           .catch((err) => {
             this.set('error.value', true);

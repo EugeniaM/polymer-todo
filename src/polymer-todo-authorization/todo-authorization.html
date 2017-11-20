@@ -29,10 +29,10 @@
       }
 
       .auth-link {
-        text-decoration: none;
         color: #009688;
         font-size: 24px;
         font-weight: 600;
+        cursor: pointer;
       }
 
       .auth-link:hover {
@@ -46,15 +46,15 @@
 
       <paper-card view="">
         <div class="auth-nav">
-          <a href="/sign_in" class="auth-link">SIGN IN</a>
+          <div id="sign_in" class="auth-link" on-click="navigate">SIGN IN</div>
           <span>or</span>
-          <a href="/sign_up" class="auth-link">SIGN UP</a>
+          <div id="sign_up" class="auth-link" on-click="navigate">SIGN UP</div>
         </div>
       </paper-card>
 
-      <todo-signin view="sign_in"></todo-signin>
+      <todo-signin view="sign_in" page="{{page}}"></todo-signin>
 
-      <todo-signup view="sign_up">SIGN UP</todo-signup>
+      <todo-signup view="sign_up" page="{{page}}"></todo-signup>
 
     </iron-pages>
   </template>
@@ -67,9 +67,14 @@
           page: {
             type: String,
             value: '',
+            notify: true,
             observer: '_pageChanged'
           }
         };
+      }
+
+      navigate(e) {
+        this.set('page', e.target.id);
       }
 
       _pageChanged(page) {

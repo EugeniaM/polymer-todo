@@ -36,14 +36,24 @@
     <app-route
       route="{{route}}"
       pattern="/:page"
-      data="{{routeData}}">
+      data="{{routeData}}"
+      tail="{{subroute}}">
+    </app-route>
+    <app-route
+      route="{{subroute}}"
+      pattern="/:page"
+      data="{{subrouteData}}">
     </app-route>
 
     <iron-pages
-      attr-for-selected="auth"
-      selected="[[auth]]">
-      <todo-authorization auth="unauthorized" page="{{routeData.page}}"></todo-authorization>
-      <div auth="authorized">22222222</div>
+      attr-for-selected="view"
+      selected="[[routeData.page]]">
+      <todo-authorization 
+        view="authorization" 
+        page="{{subrouteData.page}}"
+        on-do-redirect="onRedirect">
+      </todo-authorization>
+      <div view="">22222222</div>
     </iron-pages>
 
   </template>
@@ -84,23 +94,41 @@
           },
           routeData: {
             type: Object,
-            value() { return {}; }
+            value() { return {}; },
+            observer: "_onRouteChange"
           }
         };
       }
 
+      static get listeners() {
+
+      }
+
       ready() {
         super.ready();
-        if (this.signedIn) {
-          this.set('auth', 'authorized');
-        } else {
-          this.set('auth', 'unauthorized');
+        if (!this.signedIn) {
+          this.set('routeData.page', 'authorization');
         }
 
-        console.log('ROUTE ===> ', this.route);
-        console.log('DATA ===> ', this.data);
-        console.log('TAIL ===> ', this.tail);
-        console.log('PAGE ===> ', this.page);
+        this.addEventListener('redirect', () => {
+          console.log('REDIRECT!');
+
+        })
+
+        // console.log('ROUTE ===> ', this.route);
+        // console.log('DATA ===> ', this.data);
+        // console.log('SUBROUTE ===> ', this.subroute);
+        // console.log('PAGE ===> ', this.page);
+      }
+
+      _onRouteChange(routeData) {
+        if (!this.signedIn) {
+          this.set('routeData.page', 'authorization');
+        }
+      }
+
+      onRedirect() {
+        this.set('route.path', "/")
       }
     }
 
