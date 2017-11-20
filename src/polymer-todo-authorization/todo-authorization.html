@@ -1,0 +1,82 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="./todo-signup.html">
+<link rel="import" href="./todo-signin.html">
+
+<dom-module id="todo-authorization">
+  <template>
+    <style>
+      :host {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: #009688;
+      }
+
+      .auth-nav {
+        width: 350px;
+        height: 250px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+      }
+
+      .auth-link {
+        text-decoration: none;
+        color: #009688;
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      .auth-link:hover {
+        color: #00695C;
+      }
+    </style>
+
+    <iron-pages
+      attr-for-selected="view"
+      selected="[[page]]">
+
+      <paper-card view="">
+        <div class="auth-nav">
+          <a href="/sign_in" class="auth-link">SIGN IN</a>
+          <span>or</span>
+          <a href="/sign_up" class="auth-link">SIGN UP</a>
+        </div>
+      </paper-card>
+
+      <todo-signin view="sign_in"></todo-signin>
+
+      <todo-signup view="sign_up">SIGN UP</todo-signup>
+
+    </iron-pages>
+  </template>
+
+  <script>
+    class TodoAuthorization extends Polymer.Element {
+      static get is() { return 'todo-authorization'; }
+      static get properties() {
+        return {
+          page: {
+            type: String,
+            value: '',
+            observer: '_pageChanged'
+          }
+        };
+      }
+
+      _pageChanged(page) {
+        console.log('!!!!!!!!!', page);
+      }
+    }
+
+    window.customElements.define(TodoAuthorization.is, TodoAuthorization);
+  </script>
+</dom-module>

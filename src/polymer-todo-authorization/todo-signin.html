@@ -1,0 +1,25 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+
+<dom-module id="todo-signin">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div>SIGN IN</div>
+  </template>
+
+  <script>
+    class TodoSignin extends Polymer.Element {
+      static get is() { return 'todo-signin'; }
+      static get properties() {
+
+      }
+    }
+
+    window.customElements.define(TodoSignin.is, TodoSignin);
+  </script>
+</dom-module>

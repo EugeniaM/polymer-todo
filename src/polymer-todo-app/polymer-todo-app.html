@@ -1,0 +1,108 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-app-script.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth-script.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-database-script.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+
+<link rel="import" href="../polymer-todo-authorization/todo-authorization.html">
+
+<dom-module id="polymer-todo-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+        font-family: roboto, arial, sans-serif;
+      }
+    </style>
+
+    <firebase-app
+      auth-domain="[[config.authDomain]]"
+      database-url="[[config.databaseURL]]"
+      api-key="[[config.apiKey]]">
+    </firebase-app>
+
+    <firebase-auth
+      id="auth"
+      user="{{user}}"
+      signed-in="{{signedIn}}">
+    </firebase-auth>
+
+    <app-location route="{{route}}"></app-location>
+
+    <app-route
+      route="{{route}}"
+      pattern="/:page"
+      data="{{routeData}}">
+    </app-route>
+
+    <iron-pages
+      attr-for-selected="auth"
+      selected="[[auth]]">
+      <todo-authorization auth="unauthorized" page="{{routeData.page}}"></todo-authorization>
+      <div auth="authorized">22222222</div>
+    </iron-pages>
+
+  </template>
+
+  <script>
+
+    const config = {
+        apiKey: "AIzaSyDqryvdzHi210ZEwjC4_ueq5j1L-aaKnVQ",
+        authDomain: "polymer-todo-75258.firebaseapp.com",
+        databaseURL: "https://polymer-todo-75258.firebaseio.com"
+    }
+
+    class PolymerTodoApp extends Polymer.Element {
+      static get is() { return 'polymer-todo-app'; }
+      static get properties() {
+        return {
+          config: {
+            type: Object,
+            readOnly: true,
+            value() { return config; }
+          },
+          user: {
+            type: Object,
+            notify: true,
+            value: false
+          },
+          signedIn: {
+            type: Boolean,
+            value: false
+          },
+          auth: {
+            type: String,
+            value: ""
+          },
+          route: {
+            type: Object,
+            value() { return {}; }
+          },
+          routeData: {
+            type: Object,
+            value() { return {}; }
+          }
+        };
+      }
+
+      ready() {
+        super.ready();
+        if (this.signedIn) {
+          this.set('auth', 'authorized');
+        } else {
+          this.set('auth', 'unauthorized');
+        }
+
+        console.log('ROUTE ===> ', this.route);
+        console.log('DATA ===> ', this.data);
+        console.log('TAIL ===> ', this.tail);
+        console.log('PAGE ===> ', this.page);
+      }
+    }
+
+    window.customElements.define(PolymerTodoApp.is, PolymerTodoApp);
+  </script>
+</dom-module>
