@@ -1,8 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
-
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 
 <dom-module id="todo-signup">
   <template>
@@ -10,10 +13,76 @@
       :host {
         display: block;
       }
+
+      .signup-container {
+        width: 600px;
+        height: 300px;
+        padding: 25px;
+      }
+
+      paper-input {
+        --paper-input-container-focus-color: var(--paper-teal-500);
+      }
+
+      iron-icon {
+        color: var(--paper-teal-500);
+      }
+
+      a {
+        color: var(--paper-teal-500);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      paper-button {
+        background: var(--paper-teal-500);
+        color: #fff;
+        font-weight: 600;
+      }
+
+      paper-button:hover {
+        background: var(--paper-teal-800);
+      }
+
+      .btn-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 15px 0;
+      }
+
+      .error {
+        color: var(    --paper-red-700);
+      }
     </style>
 
-    <paper-card>
+    <firebase-auth
+      id="auth"
+      user="{{user}}">
+    </firebase-auth>
 
+    <!--<firebase-query-->
+      <!--id="query"-->
+      <!--app-name="notes"-->
+      <!--path="/notes/[[uid]]"-->
+      <!--data="{{data}}">-->
+    <!--</firebase-query>-->
+
+    <paper-card>
+      <div class="signup-container">
+        <a href="/"><iron-icon icon="icons:arrow-back"></iron-icon> BACK</a>
+        <h2>Please Sign Up</h2>
+        <paper-input type="email" label="Email" value="{{email}}"></paper-input>
+        <paper-input type="password" label="Password" value="{{password}}"></paper-input>
+
+        <template is="dom-if" if="[[error.value]]">
+          <div class="error">[[error.message]]</div>
+        </template>
+
+        <div class="btn-container">
+          <paper-button raised on-tap="signUp">SIGN UP</paper-button>
+        </div>
+      </div>
     </paper-card>
   </template>
 
@@ -21,7 +90,42 @@
     class TodoSignup extends Polymer.Element {
       static get is() { return 'todo-signup'; }
       static get properties() {
+        return {
+          email: {
+            type: String,
+            value: ''
+          },
+          password: {
+            type: String,
+            value: ''
+          },
+          error: {
+            type: Object,
+            value() { return {}; }
+          },
+          user: {
+            type: Object,
+            notify: true,
+            value: false
+          },
+        }
+      }
 
+      signUp() {
+        if (!this.email || !this.password) {
+          this.set('error.value', true);
+          this.set('error.message', 'Email or Password is invalid');
+          return;
+        }
+
+        this.$.auth.createUserWithEmailAndPassword(this.email, this.password)
+          .then((user) => {
+            console.log()
+          })
+          .catch((err) => {
+            this.set('error.value', true);
+            this.set('error.message', err.message);
+          });
       }
     }
 
