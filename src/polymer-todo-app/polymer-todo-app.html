@@ -40,26 +40,22 @@
       data="{{routeData}}"
       tail="{{subroute}}">
     </app-route>
-    <app-route
-      route="{{subroute}}"
-      pattern="/:page"
-      data="{{subrouteData}}">
-    </app-route>
 
     <iron-pages
       attr-for-selected="view"
-      selected="[[routeData.page]]">
+      selected="[[auth]]">
 
       <todo-authorization 
-        view="authorization" 
-        page="{{subrouteData.page}}"
+        view="unauthorized" 
+        page="{{routeData.page}}"
         on-do-redirect="onRedirect">
       </todo-authorization>
 
       <todo-main
-        view=""
+        view="authorized"
         current-user-id="{{currentUserId}}"
-        route="{{route}}">
+        page="{{routeData.page}}"
+        on-do-redirect="onRedirect">
       </todo-main>
     </iron-pages>
 
@@ -118,9 +114,12 @@
         super.ready();
         firebase.auth().onAuthStateChanged((user) => {
           if (!user || !firebase.auth().currentUser) {
-            this.set('routeData.page', 'authorization');
+            this.set('auth', 'unauthorized');
+            this.set('routeData.page', '');
           } else {
             this.set('currentUserId', user.uid);
+            this.set('auth', 'authorized');
+            this.set('routeData.page', 'todo_list');
           }
         });
 
@@ -131,7 +130,9 @@
       }
 
       onRedirect(ev) {
-        this.set('currentUserId', ev.detail.userId);
+        if (ev.detail.userId) {
+          this.set('currentUserId', ev.detail.userId);
+        }
         this.set('route.path', ev.detail.page);
       }
     }

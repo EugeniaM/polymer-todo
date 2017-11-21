@@ -1,0 +1,74 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="todo-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .shadow-2dp {
+        @apply --shadow-elevation-2dp;
+        margin: 20px 5px;
+        min-height: 500px;
+      }
+    </style>
+
+    <div class="shadow shadow-2dp">
+      <template is="dom-if" if="{{!_showTList(todosList.length)}}">
+        123
+      </template>
+
+      <template is="dom-if" if="{{_showTList(todosList.length)}}">
+        456
+      </template>
+    </div>
+  </template>
+
+  <script>
+    class TodoList extends Polymer.Element {
+      static get is() { return 'todo-list'; }
+      static get properties() {
+        return {
+          currentUserId: {
+            type: String,
+            value: ''
+          },
+          page: {
+            type: String,
+            value: '',
+            observer: 'onPageChange'
+          },
+          todosList: {
+            type: Array,
+            value() { return []; }
+          }
+        };
+      }
+
+      onPageChange(page) {
+        if (page !== 'todo_list') {
+          return;
+        }
+
+        this.getTodos();
+      }
+
+      getTodos() {
+        firebase.database()
+          .ref(`Todos/${this.currentUserId}`)
+          .on('child_added', (snap) => {
+            snap.forEach((todoItem) => {
+              this.push('todosList', todoItem.val());
+            });
+          });
+      }
+
+      _showTList(length) {
+        return !!length;
+      }
+    }
+
+    window.customElements.define(TodoList.is, TodoList);
+  </script>
+</dom-module>

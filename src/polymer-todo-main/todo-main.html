@@ -10,6 +10,7 @@
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 
+<link rel="import" href="./todo-list.html">
 
 <dom-module id="todo-main">
   <template>
@@ -68,12 +69,12 @@
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
         <app-toolbar>Menu</app-toolbar>
-        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <div class="submenu">
+        <iron-selector selected="[[page]]" attr-for-selected="view" class="drawer-list" role="navigation">
+          <div class="submenu" path="todo_list" on-tap="navigateToPage">
             <iron-icon icon="list"></iron-icon>
             Todo List
           </div>
-          <div class="submenu">
+          <div class="submenu" path="add_todo" on-tap="navigateToPage">
             <iron-icon icon="add-circle-outline"></iron-icon>
             Add new
           </div>
@@ -95,10 +96,17 @@
         </app-header>
 
         <iron-pages
-          selected="0"
+          selected="[[page]]"
+          attr-for-selected="view"
           role="main">
-          <div name="view1">1</div>
-          <div name="view2">2</div>
+
+          <todo-list
+            view="todo_list"
+            current-user-id="[[currentUserId]]"
+            page="[[page]]">
+          </todo-list>
+          
+          <div view="add_todo">2</div>
         </iron-pages>
       </app-header-layout>
     </app-drawer-layout>
@@ -113,12 +121,17 @@
             type: String,
             value: ''
           },
-          route: {
-            type: Object,
-            value() { return {}; },
+          page: {
+            type: String,
+            value: '',
             notify: true
           }
         }
+      }
+
+      navigateToPage(e) {
+        const path = e.currentTarget.getAttribute('path') ? e.currentTarget.getAttribute('path') : e.currentTarget.path;
+        this.set('page', path);
       }
 
       signOut() {
