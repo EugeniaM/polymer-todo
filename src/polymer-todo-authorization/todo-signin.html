@@ -1,5 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
+
+<link rel="import" href="./todo-auth-form.html">
+<link rel="import" href="./navigate-back.html">
+<link rel="import" href="./auth-button.html">
 
 <dom-module id="todo-signin">
   <template>
@@ -7,16 +12,86 @@
       :host {
         display: block;
       }
+
+      .signin-container {
+        width: 600px;
+        height: 300px;
+        padding: 25px;
+      }
     </style>
 
-    <div>SIGN IN</div>
+    <firebase-auth
+      id="auth"
+      user="{{user}}">
+    </firebase-auth>
+
+    <paper-card>
+      <div class="signin-container">
+
+        <navigate-back page="{{page}}"></navigate-back>
+
+        <h2>Please Sign In</h2>
+
+        <todo-auth-form
+          email="{{email}}"
+          password="{{password}}"
+          error="[[error]]">
+        </todo-auth-form>
+
+        <auth-button on-tap="signIn">
+          <span slot="title">SIGN IN</span>
+        </auth-button>
+      </div>
+    </paper-card>
   </template>
 
   <script>
     class TodoSignin extends Polymer.Element {
       static get is() { return 'todo-signin'; }
       static get properties() {
+        return {
+          page: {
+            type: String,
+            value: '',
+            notify: true
+          },
+          email: {
+            type: String,
+            value: ''
+          },
+          password: {
+            type: String,
+            value: ''
+          },
+          error: {
+            type: Object,
+            value() { return {}; }
+          }
+        }
+      }
 
+      signIn() {
+        if (!this.email || !this.password) {
+          this.set('error.value', true);
+          this.set('error.message', 'Please fill in Email and Password');
+          return;
+        }
+
+        this.$.auth.signInWithEmailAndPassword(this.email, this.password)
+          .then((user) => {
+            const event = new CustomEvent('do-redirect', {
+              bubbles: true, composed: true,
+              detail: {
+                page: '/',
+                userId: user.uid
+              }
+            });
+            this.dispatchEvent(event);
+          })
+          .catch((err) => {
+              this.set('error.value', true);
+            this.set('error.message', err.message);
+          });
       }
     }
 

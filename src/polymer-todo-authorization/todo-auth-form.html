@@ -1,0 +1,53 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+<dom-module id="todo-auth-form">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      paper-input {
+        --paper-input-container-focus-color: var(--paper-teal-500);
+      }
+
+      .error {
+        color: var(--paper-red-700);
+      }
+    </style>
+
+    <paper-input type="email" label="Email" value="{{email}}"></paper-input>
+    <paper-input type="password" label="Password" value="{{password}}"></paper-input>
+
+    <template is="dom-if" if="[[error.value]]">
+      <div class="error">[[error.message]]</div>
+    </template>
+  </template>
+
+  <script>
+    class TodoAuthForm extends Polymer.Element {
+      static get is() { return 'todo-auth-form'; }
+      static get properties() {
+        return {
+          email: {
+            type: String,
+            value: '',
+            notify: true
+          },
+          password: {
+            type: String,
+            value: '',
+            notify: true
+          },
+          error: {
+            type: Object,
+            value() { return {}; }
+          }
+        }
+      }
+    }
+
+    window.customElements.define(TodoAuthForm.is, TodoAuthForm);
+  </script>
+</dom-module>

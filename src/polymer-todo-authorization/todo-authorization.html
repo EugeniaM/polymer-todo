@@ -16,7 +16,7 @@
         right: 0;
         bottom: 0;
         left: 0;
-        background: #009688;
+        background: var(--paper-teal-500);
       }
 
       .auth-nav {
@@ -67,18 +67,13 @@
           page: {
             type: String,
             value: '',
-            notify: true,
-            observer: '_pageChanged'
+            notify: true
           }
         };
       }
 
       navigate(e) {
         this.set('page', e.target.id);
-      }
-
-      _pageChanged(page) {
-        console.log('!!!!!!!!!', page);
       }
     }
 

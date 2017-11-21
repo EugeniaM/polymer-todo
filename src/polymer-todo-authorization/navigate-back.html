@@ -1,0 +1,49 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+
+<dom-module id="navigate-back">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      iron-icon {
+        color: var(--paper-teal-500);
+      }
+
+      .back-btn {
+        color: var(--paper-teal-500);
+        font-weight: 600;
+        cursor: pointer;
+      }
+    </style>
+
+    <div class="back-btn" on-click="navigateBack">
+      <iron-icon icon="icons:arrow-back"></iron-icon>
+      BACK
+    </div>
+  </template>
+
+  <script>
+    class NavigateBack extends Polymer.Element {
+      static get is() { return 'navigate-back'; }
+      static get properties() {
+        return {
+          page: {
+            type: String,
+            value: '',
+            notify: true
+          }
+        }
+      }
+
+      navigateBack() {
+        this.set('page', '');
+      }
+    }
+
+    window.customElements.define(NavigateBack.is, NavigateBack);
+  </script>
+</dom-module>

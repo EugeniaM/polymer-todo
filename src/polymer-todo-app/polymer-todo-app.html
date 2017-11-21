@@ -9,6 +9,7 @@
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 
 <link rel="import" href="../polymer-todo-authorization/todo-authorization.html">
+<link rel="import" href="../polymer-todo-main/todo-main.html">
 
 <dom-module id="polymer-todo-app">
   <template>
@@ -48,12 +49,18 @@
     <iron-pages
       attr-for-selected="view"
       selected="[[routeData.page]]">
+
       <todo-authorization 
         view="authorization" 
         page="{{subrouteData.page}}"
         on-do-redirect="onRedirect">
       </todo-authorization>
-      <div view="">22222222</div>
+
+      <todo-main
+        view=""
+        current-user-id="{{currentUserId}}"
+        route="{{route}}">
+      </todo-main>
     </iron-pages>
 
   </template>
@@ -94,8 +101,11 @@
           },
           routeData: {
             type: Object,
-            value() { return {}; },
-            observer: "_onRouteChange"
+            value() { return {}; }
+          },
+          currentUserId: {
+            type: String,
+            value: ''
           }
         };
       }
@@ -106,14 +116,13 @@
 
       ready() {
         super.ready();
-        if (!this.signedIn) {
-          this.set('routeData.page', 'authorization');
-        }
-
-        this.addEventListener('redirect', () => {
-          console.log('REDIRECT!');
-
-        })
+        firebase.auth().onAuthStateChanged((user) => {
+          if (!user || !firebase.auth().currentUser) {
+            this.set('routeData.page', 'authorization');
+          } else {
+            this.set('currentUserId', user.uid);
+          }
+        });
 
         // console.log('ROUTE ===> ', this.route);
         // console.log('DATA ===> ', this.data);
@@ -121,14 +130,9 @@
         // console.log('PAGE ===> ', this.page);
       }
 
-      _onRouteChange(routeData) {
-        if (!this.signedIn) {
-          this.set('routeData.page', 'authorization');
-        }
-      }
-
-      onRedirect() {
-        this.set('route.path', "/")
+      onRedirect(ev) {
+        this.set('currentUserId', ev.detail.userId);
+        this.set('route.path', ev.detail.page);
       }
     }
 
