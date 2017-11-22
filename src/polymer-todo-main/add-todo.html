@@ -1,0 +1,117 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="./todo-task-form.html">
+<link rel="import" href="../shared/todo-button.html">
+
+<dom-module id="add-todo">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .shadow-2dp {
+        @apply --shadow-elevation-2dp;
+        margin: 20px 5px;
+        min-height: 500px;
+      }
+
+      h2 {
+        font-weight: 600;
+        color: var(--paper-teal-500);
+        text-align: center;
+        padding-top: 25px;
+      }
+
+      .form-container {
+        padding: 0 50px;
+      }
+    </style>
+
+    <div class="shadow shadow-2dp">
+      <h2>Add new task</h2>
+
+      <div class="form-container">
+        <todo-task-form
+          title="{{title}}"
+          description="{{description}}">
+        </todo-task-form>
+      </div>
+
+      <todo-button on-tap="addTask" disabled="[[disabled]]">
+        <span slot="title">Add Task</span>
+      </todo-button>
+
+    </div>
+  </template>
+
+  <script>
+    class AddTodo extends Polymer.Element {
+      static get is() { return 'add-todo'; }
+      static get properties() {
+        return {
+          currentUserId: {
+            type: String,
+            value: ''
+          },
+          page: {
+            type: String,
+            value: '',
+            notify: true,
+            observer: 'onPageChange'
+          },
+          title: {
+            type: String,
+            value: ''
+          },
+          description: {
+            type: String,
+            value: ''
+          },
+          disabled: {
+            type: Boolean,
+            value: false
+          }
+        };
+      }
+
+      static get observers() {
+        return [
+          'onInputsChange(title, description)'
+        ]
+      }
+
+      onPageChange(page) {
+        if (page !== 'add_todo') {
+          this.set('title', '');
+          this.set('description', '');
+        }
+      }
+
+      addTask() {
+        const key = firebase.database().ref(`Todos/${this.currentUserId}`).push().key;
+        const data = {
+          title: this.title,
+          description: this.description,
+          done: false,
+          timestamp: new Date().getTime()
+        }
+
+        firebase.database()
+          .ref(`Todos/${this.currentUserId}/${key}`)
+          .set(data, () => {
+            this.set('page', 'todo_list');
+          })
+      }
+
+      onInputsChange(title, description) {
+        if (title && description) {
+          this.set('disabled', false);
+        } else {
+          this.set('disabled', true);
+        }
+      }
+    }
+
+    window.customElements.define(AddTodo.is, AddTodo);
+  </script>
+</dom-module>

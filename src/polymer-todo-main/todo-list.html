@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="./todo-item.html">
 
 <dom-module id="todo-list">
   <template>
@@ -12,15 +13,35 @@
         margin: 20px 5px;
         min-height: 500px;
       }
+
+      .todos-title {
+        font-weight: 600;
+        color: var(--paper-teal-500);
+        text-align: center;
+        padding-top: 25px;
+      }
+
+      .empty-todo {
+        text-align: center;
+        color: #78909c;
+        font-style: italic;
+      }
     </style>
 
     <div class="shadow shadow-2dp">
+      <h2 class="todos-title">TODO List</h2>
       <template is="dom-if" if="{{!_showTList(todosList.length)}}">
-        123
+        <div class="empty-todo">You have no tasks in todo list yet</div>
       </template>
 
       <template is="dom-if" if="{{_showTList(todosList.length)}}">
-        456
+        <template is="dom-repeat" items="{{todosList}}" as="todo" sort="_sortTodosList">
+          <todo-item
+            todo="{{todo}}"
+            current-user-id="[[currentUserId]]"
+            on-do-delete="onDelete">
+          </todo-item>
+        </template>
       </template>
     </div>
   </template>
@@ -36,8 +57,7 @@
           },
           page: {
             type: String,
-            value: '',
-            observer: 'onPageChange'
+            value: ''
           },
           todosList: {
             type: Array,
@@ -46,8 +66,15 @@
         };
       }
 
-      onPageChange(page) {
-        if (page !== 'todo_list') {
+      static get observers() {
+        return [
+          'onPageChange(page, currentUserId)'
+        ]
+      }
+
+      onPageChange(page, currentUserId) {
+        if (page !== 'todo_list' || !currentUserId) {
+          this.set('todosList', []);
           return;
         }
 
@@ -57,15 +84,38 @@
       getTodos() {
         firebase.database()
           .ref(`Todos/${this.currentUserId}`)
-          .on('child_added', (snap) => {
-            snap.forEach((todoItem) => {
-              this.push('todosList', todoItem.val());
+          .once('value', (snap) => {
+            snap.forEach((item) => {
+              let todoItem = item.val();
+              todoItem.id = item.key;
+              this.push('todosList', todoItem);
             });
+          });
+      }
+
+      onDelete(ev) {
+        const id = ev.detail.todoId;
+        if (!id) return;
+
+        firebase.database()
+          .ref(`Todos/${this.currentUserId}/${id}`)
+          .set(null, () => {
+            let index = this.todosList.findIndex(elem => {
+              return elem.id === id;
+            });
+
+            if (index > -1) {
+              this.splice('todosList', index, 1);
+            }
           });
       }
 
       _showTList(length) {
         return !!length;
+      }
+
+      _sortTodosList(a, b) {
+        return a.timestamp < b.timestamp ? -1 : 1;
       }
     }
 

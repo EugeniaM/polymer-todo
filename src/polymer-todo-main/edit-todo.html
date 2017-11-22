@@ -1,0 +1,116 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="./todo-task-form.html">
+<link rel="import" href="../shared/todo-button.html">
+
+<dom-module id="edit-todo">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      .shadow-2dp {
+        @apply --shadow-elevation-2dp;
+        margin: 20px 5px;
+        min-height: 500px;
+      }
+
+      h2 {
+        font-weight: 600;
+        color: var(--paper-teal-500);
+        text-align: center;
+        padding-top: 25px;
+      }
+
+      .form-container {
+        padding: 0 50px;
+      }
+    </style>
+
+    <div class="shadow shadow-2dp">
+      <h2>Edit task</h2>
+
+      <div class="form-container">
+        <todo-task-form
+          title="{{selectedTodo.title}}"
+          description="{{selectedTodo.description}}">
+        </todo-task-form>
+      </div>
+
+      <todo-button on-tap="editTask" disabled="[[disabled]]">
+        <span slot="title">Edit Task</span>
+      </todo-button>
+
+    </div>
+  </template>
+
+  <script>
+    class EditTodo extends Polymer.Element {
+      static get is() { return 'edit-todo'; }
+      static get properties() {
+        return {
+          currentUserId: {
+            type: String,
+            value: ''
+          },
+          page: {
+            type: String,
+            value: '',
+            notify: true,
+            observer: 'onPageChange'
+          },
+//          title: {
+//            type: String,
+//            value: ''
+//          },
+//          description: {
+//            type: String,
+//            value: ''
+//          },
+          disabled: {
+            type: Boolean,
+            value: false
+          },
+          selectedTodo: {
+            type: Object,
+            value() { return {}; }
+          }
+        };
+      }
+
+      static get observers() {
+        return [
+          'onInputsChange(selectedTodo.title, selectedTodo.description)'
+        ]
+      }
+
+      onPageChange(page) {
+        if (page !== 'edit_todo') {
+          this.set('title', '');
+          this.set('description', '');
+        }
+      }
+
+      editTask() {
+        firebase.database()
+          .ref(`Todos/${this.currentUserId}/${this.selectedTodo.id}`)
+          .update({
+            title: this.selectedTodo.title,
+            description: this.selectedTodo.description
+          }, () => {
+            this.set('page', 'todo_list');
+          })
+      }
+
+      onInputsChange(title, description) {
+        if (title && description) {
+          this.set('disabled', false);
+        } else {
+          this.set('disabled', true);
+        }
+      }
+    }
+
+    window.customElements.define(EditTodo.is, EditTodo);
+  </script>
+</dom-module>

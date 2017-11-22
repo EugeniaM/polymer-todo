@@ -1,0 +1,136 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<dom-module id="todo-item">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      #todo-container {
+        font-size: 18px;
+        font-weight: 500;
+      }
+
+      #collapse {
+        margin: 0 25px;
+        padding: 10px 15px 10px 60px;
+        min-height: 50px;
+        background: rgba(0, 150, 136, .05);
+      }
+
+      paper-item {
+        border-bottom: 1px solid #ebebeb;
+        margin: 10px 25px;
+        cursor: pointer;
+      }
+
+      paper-checkbox.custom-checkbox {
+        --paper-checkbox-size: 24px;
+        --paper-checkbox-checked-color: var(--paper-teal-500);
+        --paper-checkbox-checked-ink-color: var(--paper-teal-500);
+        --paper-checkbox-unchecked-color: var(--paper-teal-900);
+        --paper-checkbox-unchecked-ink-color: var(--paper-teal-900);
+      }
+
+      .norrow-elem {
+        width: 45px;
+        text-align: center;
+      }
+
+      .wide-elem {
+        width: calc(100% - 135px);
+      }
+
+      paper-icon-button {
+        color: var(--paper-teal-900);
+      }
+
+    </style>
+
+    <paper-item id="todo-container" on-tap="toggle">
+      <div class="norrow-elem">
+        <paper-checkbox
+          class="custom-checkbox"
+          checked="{{todo.done}}"
+          todo="[[todo]]"
+          on-change="checked">
+        </paper-checkbox>
+      </div>
+      <div class="wide-elem">
+        {{todo.title}}
+      </div>
+      <div class="norrow-elem" on-tap="editTodo">
+        <paper-icon-button icon="create"></paper-icon-button>
+      </div>
+      <div class="norrow-elem">
+        <paper-icon-button icon="delete" on-tap="deleteTodo"></paper-icon-button>
+      </div>
+    </paper-item>
+    <iron-collapse id="collapse">
+      <div>
+        {{todo.description}}
+      </div>
+    </iron-collapse>
+  </template>
+
+  <script>
+    class TodoItem extends Polymer.Element {
+      static get is() { return 'todo-item'; }
+      static get properties() {
+        return {
+          todo: {
+            type: Object,
+            value() { return {}; }
+          },
+          currentUserId: {
+            type: String,
+            value: ''
+          }
+        };
+      }
+
+      toggle(ev) {
+        if (ev.target.tagName === 'PAPER-ICON-BUTTON' || ev.target.tagName === 'PAPER-CHECKBOX') return;
+        this.$.collapse.toggle();
+      }
+
+      checked(ev) {
+        const done = ev.target.todo ? ev.target.todo.done : false;
+        firebase.database()
+          .ref(`Todos/${this.currentUserId}/${this.todo.id}`)
+          .update({
+            done: done
+          });
+      }
+
+      editTodo() {
+        const event = new CustomEvent('do-redirect', {
+          bubbles: true, composed: true,
+          detail: {
+            page: 'edit_todo',
+            selectedTodo: this.todo
+          }
+        });
+        this.dispatchEvent(event);
+      }
+
+      deleteTodo() {
+        const event = new CustomEvent('do-delete', {
+          bubbles: true, composed: true,
+          detail: {
+            todoId: this.todo.id
+          }
+        });
+        this.dispatchEvent(event);
+      }
+    }
+
+    window.customElements.define(TodoItem.is, TodoItem);
+  </script>
+</dom-module>

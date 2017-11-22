@@ -1,0 +1,66 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="todo-button">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      paper-button {
+        background-color: var(--paper-teal-500);
+        color: #fff;
+        font-weight: 600;
+      }
+
+      paper-button:hover {
+        background: var(--paper-teal-800);
+      }
+
+      paper-button.disabled {
+        background: #eaeaea;
+      }
+
+      .btn-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 15px 0;
+      }
+    </style>
+
+    <div class="btn-container">
+      <paper-button
+        class$="{{getClass(disabled)}}"
+        raised
+        disabled="{{disabled}}">
+        <slot name="title"></slot>
+      </paper-button>
+    </div>
+  </template>
+
+  <script>
+    class TodoButton extends Polymer.Element {
+      static get is() { return 'todo-button'; }
+      static get properties() {
+        return {
+          disabled: {
+            type: Boolean,
+            value: false
+          }
+        };
+      }
+
+      getClass(disabled) {
+        if (disabled) {
+          return 'disabled';
+        } else {
+          return '';
+        }
+      }
+    }
+
+    window.customElements.define(TodoButton.is, TodoButton);
+  </script>
+</dom-module>

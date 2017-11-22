@@ -11,6 +11,8 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="./todo-list.html">
+<link rel="import" href="./add-todo.html">
+<link rel="import" href="./edit-todo.html">
 
 <dom-module id="todo-main">
   <template>
@@ -91,7 +93,7 @@
         <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>TODO</div>
+            <div main-title>TODO APP</div>
           </app-toolbar>
         </app-header>
 
@@ -106,7 +108,18 @@
             page="[[page]]">
           </todo-list>
           
-          <div view="add_todo">2</div>
+          <add-todo
+            view="add_todo"
+            current-user-id="[[currentUserId]]"
+            page="{{page}}">
+          </add-todo>
+
+          <edit-todo
+            view="edit_todo"
+            current-user-id="[[currentUserId]]"
+            page="{{page}}"
+            selected-todo="[[selectedTodo]]">
+          </edit-todo>
         </iron-pages>
       </app-header-layout>
     </app-drawer-layout>
@@ -125,6 +138,10 @@
             type: String,
             value: '',
             notify: true
+          },
+          selectedTodo: {
+            type: Object,
+            value() { return {}; }
           }
         }
       }

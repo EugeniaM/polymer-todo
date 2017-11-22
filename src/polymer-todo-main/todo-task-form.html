@@ -1,0 +1,43 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+
+<dom-module id="todo-task-form">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      paper-input, paper-textarea {
+        --paper-input-container-focus-color: var(--paper-teal-500);
+      }
+    </style>
+
+    <paper-input type="text" label="Title" value="{{title}}" always-float-label></paper-input>
+    <paper-textarea label="Description" value="{{description}}" rows="3" always-float-label></paper-textarea>
+
+  </template>
+
+  <script>
+    class TodoTaskForm extends Polymer.Element {
+      static get is() { return 'todo-task-form'; }
+      static get properties() {
+        return {
+          title: {
+            type: String,
+            value: '',
+            notify: true
+          },
+          description: {
+            type: String,
+            value: '',
+            notify: true
+          }
+        };
+      }
+    }
+
+    window.customElements.define(TodoTaskForm.is, TodoTaskForm);
+  </script>
+</dom-module>

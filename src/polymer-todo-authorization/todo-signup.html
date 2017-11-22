@@ -4,7 +4,7 @@
 
 <link rel="import" href="./todo-auth-form.html">
 <link rel="import" href="./navigate-back.html">
-<link rel="import" href="./auth-button.html">
+<link rel="import" href="../shared/todo-button.html">
 
 <dom-module id="todo-signup">
   <template>
@@ -38,9 +38,9 @@
           error="[[error]]">
         </todo-auth-form>
 
-        <auth-button on-tap="signUp">
+        <todo-button on-tap="signUp">
           <span slot="title">SIGN UP</span>
-        </auth-button>
+        </todo-button>
       </div>
     </paper-card>
   </template>
