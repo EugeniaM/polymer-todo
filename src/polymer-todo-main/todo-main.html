@@ -118,7 +118,7 @@
             view="edit_todo"
             current-user-id="[[currentUserId]]"
             page="{{page}}"
-            selected-todo="[[selectedTodo]]">
+            route="{{subroute}}">
           </edit-todo>
         </iron-pages>
       </app-header-layout>
@@ -139,9 +139,9 @@
             value: '',
             notify: true
           },
-          selectedTodo: {
-            type: Object,
-            value() { return {}; }
+          subroute: {
+              type: Object,
+              value() { return {}; }
           }
         }
       }

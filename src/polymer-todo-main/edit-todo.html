@@ -1,4 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+
 <link rel="import" href="./todo-task-form.html">
 <link rel="import" href="../shared/todo-button.html">
 
@@ -27,13 +29,19 @@
       }
     </style>
 
+    <app-route
+      route="{{route}}"
+      pattern="/:task_id"
+      data="{{routeData}}">
+    </app-route>
+
     <div class="shadow shadow-2dp">
       <h2>Edit task</h2>
 
       <div class="form-container">
         <todo-task-form
-          title="{{selectedTodo.title}}"
-          description="{{selectedTodo.description}}">
+          title="{{title}}"
+          description="{{description}}">
         </todo-task-form>
       </div>
 
@@ -59,21 +67,25 @@
             notify: true,
             observer: 'onPageChange'
           },
-//          title: {
-//            type: String,
-//            value: ''
-//          },
-//          description: {
-//            type: String,
-//            value: ''
-//          },
+          route: {
+            type: Object,
+            value() { return {}; }
+          },
+          title: {
+            type: String,
+            value: ''
+          },
+          description: {
+            type: String,
+            value: ''
+          },
           disabled: {
             type: Boolean,
             value: false
           },
-          selectedTodo: {
-            type: Object,
-            value() { return {}; }
+          taskId: {
+            type: String,
+            value: ''
           }
         };
       }
@@ -88,15 +100,26 @@
         if (page !== 'edit_todo') {
           this.set('title', '');
           this.set('description', '');
+          return;
         }
+
+        this.set('taskId', this.routeData.task_id);
+        firebase.database()
+          .ref(`Todos/${this.currentUserId}/${this.taskId}`)
+          .once('value', (snap) => {
+            const task = snap.val();
+            if (!task) return;
+            this.set('title', task.title);
+            this.set('description', task.description);
+          });
       }
 
       editTask() {
         firebase.database()
-          .ref(`Todos/${this.currentUserId}/${this.selectedTodo.id}`)
+          .ref(`Todos/${this.currentUserId}/${this.taskId}`)
           .update({
-            title: this.selectedTodo.title,
-            description: this.selectedTodo.description
+            title: this.title,
+            description: this.description
           }, () => {
             this.set('page', 'todo_list');
           })

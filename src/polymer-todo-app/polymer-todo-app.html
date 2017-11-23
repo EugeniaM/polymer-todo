@@ -56,7 +56,7 @@
         current-user-id="{{currentUserId}}"
         page="{{routeData.page}}"
         on-do-redirect="onRedirect"
-        selected-todo="[[selectedTodo]]">
+        subroute="[[subroute]]">
       </todo-main>
     </iron-pages>
 
@@ -103,10 +103,6 @@
           currentUserId: {
             type: String,
             value: ''
-          },
-          selectedTodo: {
-            type: Object,
-            value() { return {} }
           }
         };
       }
@@ -137,10 +133,6 @@
       onRedirect(ev) {
         if (ev.detail.userId) {
           this.set('currentUserId', ev.detail.userId);
-        }
-
-        if (ev.detail.selectedTodo) {
-          this.set('selectedTodo', ev.detail.selectedTodo);
         }
 
         this.set('route.path', ev.detail.page);

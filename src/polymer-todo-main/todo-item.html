@@ -113,8 +113,7 @@
         const event = new CustomEvent('do-redirect', {
           bubbles: true, composed: true,
           detail: {
-            page: 'edit_todo',
-            selectedTodo: this.todo
+            page: `edit_todo/${this.todo.id}`
           }
         });
         this.dispatchEvent(event);
